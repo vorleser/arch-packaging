@@ -14,6 +14,7 @@ install='vorleser.install'
 makedepends=('rust' 'cargo' 'git')
 source=("$pkgname::git+https://github.com/hatzel/vorleser-server")
 sha256sums=('SKIP')
+OPTIONS+=(debug !strip)
 
 pgkver() {
   git describe --long | sed -r 's/-([0-9,a-g,A-G]{7}.*)//' | sed 's/-/./'
