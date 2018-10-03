@@ -1,6 +1,6 @@
 # Maintainer: Hans Ole Hatzel <hhatzel@gmail.com>
 
-pkgname=vorleser-server
+pkgname=vorleser-git
 pkgdesc='A server to serve audiobook files and synchronize playback positions.'
 arch=('i686' 'x86_64')
 url='https://github.com/hatzel/vorleser-server'
@@ -11,9 +11,9 @@ depends=('systemd' 'ffmpeg' 'sqlite')
 provides=('vorleser')
 backup=('etc/vorleser.toml')
 install='vorleser.install'
-makedepends=('rust' 'cargo' 'git')
-source=("$pkgname::git+https://github.com/hatzel/vorleser-server")
-sha256sums=('SKIP')
+makedepends=('rustup' 'git' 'clang')
+source=("$pkgname::git+https://github.com/vorleser/vorleser-server" vorleser.service vorleser.sysuser)
+sha256sums=(SKIP SKIP SKIP)
 OPTIONS+=(debug !strip)
 
 pgkver() {
@@ -22,12 +22,13 @@ pgkver() {
 
 package() {
   cd $pkgname
-  cargo build --release
+  rustup install nightly-2018-09-27
+  cargo +nightly-2018-09-27 build --release
 
   install -D -m755 "$srcdir/$pkgname/target/release/vorleser_server_bin" "$pkgdir/usr/bin/vorleser"
   install -D -m644 "$srcdir/$pkgname/vorleser-default.toml" "$pkgdir/etc/vorleser.toml"
-  install -D -m644 ../../vorleser.service "$pkgdir/usr/lib/systemd/system/vorleser.service"
-  install -D -m644 ../../vorleser.sysuser "$pkgdir/usr/lib/sysusers.d/vorleser.conf"
+  install -D -m644 $srcdir/vorleser.service "$pkgdir/usr/lib/systemd/system/vorleser.service"
+  install -D -m644 $srcdir/vorleser.sysuser "$pkgdir/usr/lib/sysusers.d/vorleser.conf"
 
   install -D -m644 "$srcdir/$pkgname/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
